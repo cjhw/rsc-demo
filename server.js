@@ -6,7 +6,11 @@ import sanitizeFilename from "sanitize-filename";
 createServer(async (req, res) => {
   try {
     const url = new URL(req.url, `http://${req.headers.host}`);
-    await sendHTML(res, <Router url={url} />);
+    if (url.pathname === "/client.js") {
+      await sendScript(res, "./client.js");
+    } else {
+      await sendHTML(res, <Router url={url} />);
+    }
   } catch (err) {
     console.error(err);
     res.statusCode = err.statusCode ?? 500;
@@ -64,7 +68,7 @@ async function Post({ slug }) {
 }
 
 function BlogLayout({ children }) {
-  const author = "cjhw";
+  const author = "Jae Doe";
   return (
     <html>
       <head>
@@ -73,6 +77,8 @@ function BlogLayout({ children }) {
       <body>
         <nav>
           <a href="/">Home</a>
+          <hr />
+          <input />
           <hr />
         </nav>
         <main>{children}</main>
@@ -95,8 +101,15 @@ function Footer({ author }) {
   );
 }
 
+async function sendScript(res, filename) {
+  const content = await readFile(filename, "utf8");
+  res.setHeader("Content-Type", "text/javascript");
+  res.end(content);
+}
+
 async function sendHTML(res, jsx) {
-  const html = await renderJSXToHTML(jsx);
+  let html = await renderJSXToHTML(jsx);
+  html += `<script type="module" src="/client.js"></script>`;
   res.setHeader("Content-Type", "text/html");
   res.end(html);
 }
