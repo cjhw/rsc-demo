@@ -5,7 +5,9 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "nodemon -- --experimental-loader ./node-jsx-loader.js ./server.js"
+    "start": "concurrently \"npm run start:ssr\" \"npm run start:rsc\"",
+    "start:rsc": "nodemon -- --experimental-loader ./node-jsx-loader.js ./server/rsc.js",
+    "start:ssr": "nodemon -- --experimental-loader ./node-jsx-loader.js ./server/ssr.js"
   },
   "keywords": [],
   "author": "",
